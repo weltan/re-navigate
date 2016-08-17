@@ -2,7 +2,8 @@
   (:require
     [re-frame.core :refer [register-handler after]]
     [cljs.spec :as s]
-    [navigator-cljs.db :as db :refer [app-db]]))
+    [navigator-cljs.db :as db :refer [app-db]]
+    [clojure.walk :as cw]))
 
 ;; -- Helpers --------------------------------------------------------------
 
@@ -60,3 +61,12 @@
     (-> db
         (assoc-in [:nav :index] 0)
         (assoc-in [:nav :routes] (vector (get-in db [:nav :routes 0]))))))
+
+(register-handler
+  :chat/send
+  validate-spec-mw
+  (fn [db [_ messages]]
+    (let [cljs-message (cw/keywordize-keys (js->clj (first messages)))
+          _ (.log js/console cljs-message)]
+      (-> db
+        (update-in [:messages] #(conj % cljs-message))))))

@@ -13,3 +13,9 @@
   (fn [db _]
     (reaction
       (get @db :nav))))
+
+(register-sub
+  :messages
+  (fn [db _]
+    (reaction
+      (get @db :messages))))
