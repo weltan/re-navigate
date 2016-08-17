@@ -102,11 +102,11 @@
 
 (defn chat-view []
   (let [messages (subscribe [:messages])]
-      (fn []
-        [gifted-chat-component {:user (clj->js {:_id 1})
-                                :style (:view-container style)
-                                :messages (reverse @messages)
-                                :onSend #(dispatch [:chat/send %])}])))
+    (fn []
+      [gifted-chat-component {:user (clj->js {:_id 1})
+                              :style (:view-container style)
+                              :messages (reverse @messages)
+                              :onSend #(dispatch [:chat/send %])}])))
 
 (def data-source (react-native.ListView.DataSource.
                    (clj->js {:rowHasChanged (fn [r1 r2] (not= r1 r2))})))
@@ -138,14 +138,20 @@
                                                                                         :key row-id
                                                                                         :section-id section-id}))}])
 
+; We get current-scene info from props -> "scene" -> "key", rather than :nav/routes,
+; because if you use :nav/routes, it switches scenes before the animation happens, and other
+; indeterminate behavior...
 (defn scene [props]
   (.log js/console props)
-  (let [current-key (aget props "scene" "key")]
-    (case (keyword current-key)
-      :scene_login-route [login-scene]
-      :scene_chat-table-route [chat-table-view]
-      :scene_chat-route [chat-view]
-      [login-scene])))
+  (let [current-scene (aget props "scene" "key")
+        _ (.log js/console current-scene)]
+        ;current-routes (subscribe [:nav/routes])
+        ;current-scene (keyword (:key (last @current-routes)))
+    (case (keyword current-scene)
+        :scene_login-route [login-scene]
+        :scene_chat-table-route [chat-table-view]
+        :scene_chat-route [chat-view]
+        [login-scene])))
 
 (defn app-root []
   (let [nav (subscribe [:nav/state])]

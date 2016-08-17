@@ -9,6 +9,12 @@
       (get-in @db [:nav :index]))))
 
 (register-sub
+  :nav/routes
+  (fn [db _]
+    (reaction
+      (get-in @db [:nav :routes]))))
+
+(register-sub
   :nav/state
   (fn [db _]
     (reaction
